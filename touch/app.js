@@ -1,8 +1,8 @@
 //<debug>
 Ext.Loader.setPath({
     'Ext': 'sdk/src',
-    'Ext.io': '../../src/io',
-    'Ext.cf': '../../src/cf'
+    'Ext.io': 'lib/io/src/io',
+    'Ext.cf': 'lib/io/src/cf'
 });
 //</debug>
 
@@ -29,11 +29,18 @@ Ext.application({
     launch: function() {
         // Destroy the #appLoadingIndicator element
         Ext.fly('appLoadingIndicator').destroy();
-        Ext.io.setup({appId:"foobar", deviceId:"foobar"});
-        Ext.io.init();
+        Ext.io.Io.setup({appId:"5wKqVkiRrwS0zH8rr1otGcFmOiQ", deviceId:"foobar", url:"http://msg.sencha-dev.io"});
+        Ext.io.Io.init();
 
         // Initialize the main view
         Ext.Viewport.add(Ext.create('ioExamples.view.Main'));
+        
+        
+        Ext.io.Io.getGroup({id: "H2CP1N3mZst4IqZuEHytuUyepp0", callback: function(options, success, group){console.log("args", group);
+        
+        ioExamples.group = group;
+        
+        }});
         
         
         

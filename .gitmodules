@@ -1,0 +1,3 @@
+[submodule "touch/lib/io"]
+	path = touch/lib/io
+	url = git@github.com:senchaio/client-framework
