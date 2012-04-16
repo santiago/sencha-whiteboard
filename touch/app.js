@@ -10,11 +10,13 @@ Ext.application({
     name: 'ioExamples',
 
     requires: [
-        'Ext.MessageBox',
-        'Ext.io.Io' /* requires base Io singlton so that we can call Ext.io.init(); FIXME: simplify for the release. */
+        'Ext.MessageBox'
+        , 'Ext.io.Io' /* requires base Io singlton so that we can call Ext.io.init(); FIXME: simplify for the release. */
+        , 'Ext.io.data.Proxy'
     ],
 
     views: ['Main'],
+    controllers: ['Main'],
 
     icon: {
         57: 'resources/icons/Icon.png',
@@ -23,27 +25,56 @@ Ext.application({
         144: 'resources/icons/Icon~ipad@2x.png'
     },
     
+   
     phoneStartupScreen: 'resources/loading/Homescreen.jpg',
     tabletStartupScreen: 'resources/loading/Homescreen~ipad.jpg',
 
     launch: function() {
         // Destroy the #appLoadingIndicator element
         Ext.fly('appLoadingIndicator').destroy();
-        Ext.io.Io.setup({appId:"5wKqVkiRrwS0zH8rr1otGcFmOiQ", deviceId:"foobar", url:"http://msg.sencha-dev.io"});
-        Ext.io.Io.init();
-
+      
         // Initialize the main view
-        Ext.Viewport.add(Ext.create('ioExamples.view.Main'));
+        Ext.Viewport.add(Ext.create('ioExamples.view.Main'));  
         
-        
-        Ext.io.Io.getGroup({id: "H2CP1N3mZst4IqZuEHytuUyepp0", callback: function(options, success, group){console.log("args", group);
-        
-        ioExamples.group = group;
-        
-        }});
-        
-        
-        
+    },
+    
+    onAuth: function() {
+      
+           /*
+      Removing sync code until it works better. 
+      Ext.define('Friends', {
+          extend: 'Ext.data.Model',
+          config: {
+              fields: [
+                  { name: 'name', type: 'string' }
+              ]
+          }
+      });
+      
+
+ 
+      this.store = Ext.create('Ext.data.Store', {
+          model: 'Friends',
+          proxy: {
+              type: 'syncstorage',
+              id: 'myfriends'
+          },
+          autoLoad: true
+      });
+      
+      console.log("to add", this.store);
+      this.store.add({
+        name: 'Jason' + new Date().getTime()
+      });
+      
+      
+      console.log("after add", this.store);
+      this.store.sync(function(r){
+        console.log("sync callback", arguments);
+// done...
+      },this);
+      console.log("after sync");
+      */
     },
 
     onUpdated: function() {
