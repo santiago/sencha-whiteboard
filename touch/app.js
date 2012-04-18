@@ -15,7 +15,9 @@ Ext.application({
         , 'Ext.io.data.Proxy'
     ],
 
-    views: ['Main'],
+    views: ['Main', "Home", "People"],
+    models: ['Person'],
+    stores: ['People'],
     controllers: ['Main'],
 
     icon: {
