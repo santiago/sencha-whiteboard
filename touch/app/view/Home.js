@@ -11,6 +11,11 @@ Ext.define("ioExamples.view.Home", {
 
         items: [
         {
+            docked: 'top',
+            xtype: 'titlebar',
+            title: 'Sencha.io Examples'
+        },
+        {
             xtype: "panel",
             styleHtmlContent: true,
             id: "usernamePanel",

@@ -1,5 +1,7 @@
 Ext.define('ioExamples.controller.Main', {
     extend: 'Ext.app.Controller',
+    
+    requires:["ioExamples.view.Login"], 
 
     /**
     * Enter app and group id from dev console.
@@ -15,13 +17,27 @@ Ext.define('ioExamples.controller.Main', {
             },
             logoutButton: {
                 tap: 'doLogout'
-            }
+            },
+            userlist: {
+                select: 'showUserMessages'
+            },
+            
+            messagefield: {
+              action:"sendMessage"
+            },
+            peoplebackBtn: {
+                tap: 'doPeopleBack'
+            },
         },
 
         refs: {
             loginButton: 'button[action=login]',
             logoutButton: 'button[action=logout]',
-            usernamePanel: '#usernamePanel'
+            usernamePanel: '#usernamePanel',
+            userlist: '#userlist',
+            peoplePanel: '#peoplepanel',
+            messagefield: "#messagefield",
+            peoplebackBtn: 'button[action=peopleback]',
         }
     },
 
@@ -54,7 +70,8 @@ Ext.define('ioExamples.controller.Main', {
 
                 if (!isAuth) {
                     console.log("no user, we need to auth.", user);
-                    self.group.authenticate({
+                   // self.showLogin();
+                   self.group.authenticate({
                         params: {
                             username: 'joebob',
                             password: 'test123'
@@ -73,7 +90,28 @@ Ext.define('ioExamples.controller.Main', {
             }
         });
     },
-
+    
+    showLogin: function(){
+      console.log("showLogin", this.loginPanel);
+      if(!this.loginPanel){
+          this.loginPanel = Ext.create("ioExamples.view.Login");
+          console.log("showLogin2", this.loginPanel);
+          
+          var panel = this.loginPanel.query(".formpanel")[0];
+          console.log("panel", panel);
+          panel.on("action", function(){
+            console.log("hello", arguments);
+            
+          });
+          
+          Ext.Viewport.add(this.loginPanel);  
+      }
+      Ext.Viewport.setActiveItem(this.loginPanel);  
+      
+    },
+    
+    
+    
     doLogin: function() {
         // called whenever the Login button is tapped
 
@@ -101,7 +139,8 @@ Ext.define('ioExamples.controller.Main', {
                     console.log('User Id:', user.key, user);
                     store.add({
                         id: user.key,
-                        name: user.data.username
+                        name: user.data.username,
+                        userObj: user
                     });
                 }
 
@@ -117,6 +156,11 @@ Ext.define('ioExamples.controller.Main', {
         var usernamePanel = this.getUsernamePanel();
         this.getLoginButton().setDisabled(true);
         this.getLogoutButton().setDisabled(false);
+        
+        
+        user.receive({callback: function(){
+          console.log("user got a message!", arguments);
+        }})
 
         this.loadGroupMemebers();
         usernamePanel.setHtml("<h3>" + user.data.username + "</h3>");
@@ -140,7 +184,7 @@ Ext.define('ioExamples.controller.Main', {
             model: 'Friends',
             proxy: {
                 type: 'syncstorage',
-                id: 'myfriends'
+                id: 'friendlist'
             },
             autoLoad: true
         });
@@ -178,5 +222,29 @@ Ext.define('ioExamples.controller.Main', {
                 }
             }
         });
+    },
+    
+    
+    showUserMessages: function(list, record){
+      console.log("showUserMessages", record, this.getPeoplePanel());
+      this.getPeoplePanel().setActiveItem(1);
+      this.selectedUser = record;
+      this.getPeoplebackBtn().show();
+    },
+    
+    sendMessage: function(msgField){
+       console.log("sendMessage",msgField.getValue());
+       var user = this.selectedUser.data.userObj;
+       user.send({message:msgField.getValue(), callback: function(){
+         console.log("sendMessage callback", arguments);
+       }});
+    },
+    
+    
+    doPeopleBack: function(){
+       this.getPeoplePanel().setActiveItem(0);
+       this.getPeoplebackBtn().hide();
     }
+    
+    
 });

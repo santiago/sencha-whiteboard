@@ -4,13 +4,8 @@ Ext.define("ioExamples.view.Main", {
     
     config: {
         tabBarPosition: 'bottom',
-        
+         fullscreen: true,
         items: [
-        {
-            docked: 'top',
-            xtype: 'titlebar',
-            title: 'Sencha.io Examples'
-        },
            {xtype:"exmapleshome"},
            {xtype:"exmaplespeople"}
         ]
