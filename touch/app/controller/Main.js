@@ -13,7 +13,7 @@ Ext.define('ioExamples.controller.Main', {
     config: {
         control: {
             loginButton: {
-                tap: 'doLogin'
+                tap: 'checkLogin'
             },
             logoutButton: {
                 tap: 'doLogout'
@@ -28,6 +28,10 @@ Ext.define('ioExamples.controller.Main', {
             peoplebackBtn: {
                 tap: 'doPeopleBack'
             },
+            
+            siologinBtn: {
+                tap: "doAuth"
+            }
         },
 
         refs: {
@@ -38,6 +42,8 @@ Ext.define('ioExamples.controller.Main', {
             peoplePanel: '#peoplepanel',
             messagefield: "#messagefield",
             peoplebackBtn: 'button[action=peopleback]',
+            siologinBtn: 'button[action=siologin]',
+            siologinForm: '#siologinform',
         }
     },
 
@@ -47,6 +53,7 @@ Ext.define('ioExamples.controller.Main', {
         Ext.io.Io.setup({
             appId: this.appId,
             url: "http://msg.sencha-dev.io"
+           //, transportName:"socket"
         });
         Ext.io.Io.init();
         var self = this;
@@ -70,19 +77,8 @@ Ext.define('ioExamples.controller.Main', {
 
                 if (!isAuth) {
                     console.log("no user, we need to auth.", user);
-                   // self.showLogin();
-                   self.group.authenticate({
-                        params: {
-                            username: 'joebob',
-                            password: 'test123'
-                        },
-                        callback: function(opts, isAuth, user) {
-                            console.log("user authed?", arguments);
-                            if (isAuth) {
-                                self.onAuth(user);
-                            }
-                        }
-                    });
+                    self.showLogin();
+                  
                 } else {
                     console.log("User authenticated already", user);
                     self.onAuth(user);
@@ -112,15 +108,39 @@ Ext.define('ioExamples.controller.Main', {
     
     
     
-    doLogin: function() {
+    checkLogin: function() {
         // called whenever the Login button is tapped
 
-        console.log("doLogin?", this);
+        console.log("check?", this);
         this.getUsernamePanel().setHtml("<h3>checking login...</h3>");
         this.checkUser();
 
 
     },
+    
+    
+     doAuth: function() {
+          // called whenever the Login button is tapped
+        var self = this;
+        var form = self.getSiologinForm();
+        var values = form.getValues();
+        console.log("doAuth", form, form.getValues());
+
+  
+        self.group.authenticate({
+            params: {
+                username: values.username,
+                password: values.password
+            },
+            callback: function(opts, isAuth, user) {
+                console.log("user authed?", arguments);
+                if (isAuth) {
+                    self.onAuth(user);
+                }
+            }
+        });
+
+      },
 
 
     loadGroupMemebers: function() {
@@ -157,6 +177,8 @@ Ext.define('ioExamples.controller.Main', {
         this.getLoginButton().setDisabled(true);
         this.getLogoutButton().setDisabled(false);
         
+         Ext.Viewport.setActiveItem(0);  
+        
         
         user.receive({callback: function(){
           console.log("user got a message!", arguments);
@@ -186,7 +208,7 @@ Ext.define('ioExamples.controller.Main', {
                 type: 'syncstorage',
                 id: 'friendlist'
             },
-            autoLoad: true
+            autoLoad:true
         });
 
         console.log("to add", this.store);
@@ -198,6 +220,7 @@ Ext.define('ioExamples.controller.Main', {
         console.log("after add", this.store);
         this.store.sync(function(r) {
             console.log("sync callback", arguments);
+              
             // done...
         },
         this);

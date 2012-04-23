@@ -7,8 +7,6 @@ Ext.define("ioExamples.view.Login", {
         layout: "fit",
         fullscreen: true,
         
-        
-    
         control: {
            '.formpanel': {
                beforesubmit: 'login'
@@ -39,7 +37,7 @@ Ext.define("ioExamples.view.Login", {
             items: [
             {
                 xtype: "formpanel",
-                id: "loginform",
+                id: "siologinform",
                 listeners: {
                   submit:function(){
                     console.log("listeners.submit", arguments);
