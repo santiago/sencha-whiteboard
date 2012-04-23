@@ -16,9 +16,9 @@ Ext.application({
     ],
 
     views: ['Main', "Home", "People"],
-    models: ['Person'],
+    models: ['Person', "ChatMessage"],
     stores: ['People'],
-    controllers: ['Main'],
+    controllers: ['Main', "Messaging"],
 
     icon: {
         57: 'resources/icons/Icon.png',

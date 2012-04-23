@@ -1,7 +1,7 @@
 Ext.define('ioExamples.controller.Main', {
     extend: 'Ext.app.Controller',
     
-    requires:["ioExamples.view.Login"], 
+    requires:["ioExamples.view.Login", "ioExamples.store.Chats"], 
 
     /**
     * Enter app and group id from dev console.
@@ -18,17 +18,6 @@ Ext.define('ioExamples.controller.Main', {
             logoutButton: {
                 tap: 'doLogout'
             },
-            userlist: {
-                select: 'showUserMessages'
-            },
-            
-            messagefield: {
-              action:"sendMessage"
-            },
-            peoplebackBtn: {
-                tap: 'doPeopleBack'
-            },
-            
             siologinBtn: {
                 tap: "doAuth"
             }
@@ -38,12 +27,9 @@ Ext.define('ioExamples.controller.Main', {
             loginButton: 'button[action=login]',
             logoutButton: 'button[action=logout]',
             usernamePanel: '#usernamePanel',
-            userlist: '#userlist',
-            peoplePanel: '#peoplepanel',
-            messagefield: "#messagefield",
-            peoplebackBtn: 'button[action=peopleback]',
             siologinBtn: 'button[action=siologin]',
             siologinForm: '#siologinform',
+            chatList: "#chatList"
         }
     },
 
@@ -106,15 +92,11 @@ Ext.define('ioExamples.controller.Main', {
       
     },
     
-    
-    
     checkLogin: function() {
         // called whenever the Login button is tapped
-
         console.log("check?", this);
         this.getUsernamePanel().setHtml("<h3>checking login...</h3>");
         this.checkUser();
-
 
     },
     
@@ -124,7 +106,7 @@ Ext.define('ioExamples.controller.Main', {
         var self = this;
         var form = self.getSiologinForm();
         var values = form.getValues();
-        console.log("doAuth", form, form.getValues());
+        console.log("doAuth", form, form.getValues(), this);
 
   
         self.group.authenticate({
@@ -134,8 +116,11 @@ Ext.define('ioExamples.controller.Main', {
             },
             callback: function(opts, isAuth, user) {
                 console.log("user authed?", arguments);
+                
                 if (isAuth) {
                     self.onAuth(user);
+                } else {
+                  //TODO login errors!
                 }
             }
         });
@@ -180,13 +165,41 @@ Ext.define('ioExamples.controller.Main', {
          Ext.Viewport.setActiveItem(0);  
         
         
-        user.receive({callback: function(){
-          console.log("user got a message!", arguments);
-        }})
 
         this.loadGroupMemebers();
         usernamePanel.setHtml("<h3>" + user.data.username + "</h3>");
-
+        
+        
+        var chats =  Ext.create("ioExamples.store.Chats", {storeId: 'chats'});
+        
+        chats.load();
+        var self = this;
+        chats.sync(function(){
+          console.log("chat sync callback", arguments);
+        });
+        
+        this.getChatList().setStore(chats);
+        
+        globalStore = chats;
+        globalList =  this.getChatList();
+        
+        user.receive({callback: function(cb, bool, from, message){
+          console.log("user got a message!", arguments);
+          var record = {
+            message: message,
+            userID: from,
+            from: from,
+            date: new Date().getTime()
+          };
+          console.log("saving message", record);
+          chats.add(record);
+          chats.sync();
+          
+        }})
+        
+        
+        
+/*
         console.log("after auth, syncstore");
         Ext.define('Friends', {
             extend: 'Ext.data.Model',
@@ -210,21 +223,23 @@ Ext.define('ioExamples.controller.Main', {
             },
             autoLoad:true
         });
-
+*/
         console.log("to add", this.store);
         /* this.store.add({
           name: 'Jason' + new Date().getTime()
         });*/
-        globalStore = this.store;
-
-        console.log("after add", this.store);
-        this.store.sync(function(r) {
-            console.log("sync callback", arguments);
-              
-            // done...
-        },
-        this);
-        console.log("after sync");
+        // globalStore = this.store;
+        // 
+        //      console.log("after add", this.store);
+        //      this.store.sync(function(r) {
+        //          console.log("sync callback", arguments);
+        //            
+        //          // done...
+        //      },
+        //      this);
+        //      console.log("after sync");
+        //      
+        
     },
 
     doLogout: function() {
@@ -233,6 +248,19 @@ Ext.define('ioExamples.controller.Main', {
         // Need to clear all local data and stores for the user.
         // Lazy thing to do would be to reload the app in the browser but that probably isn't a good idea.
         var self = this;
+        
+        var chats = Ext.data.StoreManager.lookup('chats');
+        console.log("chats", chats);
+        if(chats) {
+       //   chats.removeAll();
+            chats.getProxy().clear();
+        }
+        
+        var people = ioExamples.app.getStores("people")[0];
+        if(people){
+          people.removeAll();
+        }
+        
         Ext.io.Io.getCurrentUser({
             callback: function(cb, isAuth, user) {
                 console.log("have user to logout", isAuth, user);
@@ -245,29 +273,6 @@ Ext.define('ioExamples.controller.Main', {
                 }
             }
         });
-    },
-    
-    
-    showUserMessages: function(list, record){
-      console.log("showUserMessages", record, this.getPeoplePanel());
-      this.getPeoplePanel().setActiveItem(1);
-      this.selectedUser = record;
-      this.getPeoplebackBtn().show();
-    },
-    
-    sendMessage: function(msgField){
-       console.log("sendMessage",msgField.getValue());
-       var user = this.selectedUser.data.userObj;
-       user.send({message:msgField.getValue(), callback: function(){
-         console.log("sendMessage callback", arguments);
-       }});
-    },
-    
-    
-    doPeopleBack: function(){
-       this.getPeoplePanel().setActiveItem(0);
-       this.getPeoplebackBtn().hide();
     }
-    
     
 });
