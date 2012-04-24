@@ -128,7 +128,7 @@ Ext.define('ioExamples.controller.Main', {
       },
 
 
-    loadGroupMemebers: function() {
+    loadGroupMemebers: function(currentUser) {
         var store = ioExamples.app.getStores("people")[0];
         /*
       *TODO Move this into the store....
@@ -142,11 +142,13 @@ Ext.define('ioExamples.controller.Main', {
                 for (i in users) {
                     var user = users[i];
                     console.log('User Id:', user.key, user);
-                    store.add({
-                        id: user.key,
-                        name: user.data.username,
-                        userObj: user
-                    });
+                    if(currentUser.key != user.key){
+                      store.add({
+                          id: user.key,
+                          name: user.data.username,
+                          userObj: user
+                      });  
+                    }
                 }
 
             },
@@ -166,7 +168,7 @@ Ext.define('ioExamples.controller.Main', {
         
         
 
-        this.loadGroupMemebers();
+        this.loadGroupMemebers(user);
         usernamePanel.setHtml("<h3>" + user.data.username + "</h3>");
         
         
@@ -174,14 +176,16 @@ Ext.define('ioExamples.controller.Main', {
         
         chats.load();
         var self = this;
+        
+        this.getChatList().setStore(chats);
+        
         chats.sync(function(){
           console.log("chat sync callback", arguments);
         });
         
-        this.getChatList().setStore(chats);
+       
         
-        globalStore = chats;
-        globalList =  this.getChatList();
+        var chatList =  this.getChatList();
         
         user.receive({callback: function(cb, bool, from, message){
           console.log("user got a message!", arguments);
@@ -194,7 +198,7 @@ Ext.define('ioExamples.controller.Main', {
           console.log("saving message", record);
           chats.add(record);
           chats.sync();
-          
+          setTimeout(function() {chatList.getScrollable().getScroller().scrollToEnd();}, 300);
         }})
         
         

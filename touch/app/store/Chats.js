@@ -4,7 +4,7 @@ Ext.define('ioExamples.store.Chats', {
         model: 'ioExamples.model.ChatMessage',
         proxy: {
             type: 'syncstorage',
-            id: 'chats'
+            id: 'mychats'
         },
         sorters: ['date'],
         autoload: true

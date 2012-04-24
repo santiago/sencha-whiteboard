@@ -28,34 +28,31 @@ Ext.define("ioExamples.view.People", {
         },
         {
             xtype: "panel",
-            layout:"vbox",
+            layout:"fit",
             items:[
               {
                   xtype: "list",
                   id: "chatList",
-
                   styleHtmlContent: true,
                   scrollable: true,
+                  scrollToTopOnRefresh: false,
+                  disableSelection: true,
                   itemTpl: " {from} : {message}",
-                  emptyText: 'No Messages',
-                  flex:"6"
+                  emptyText: 'No Messages'
               },
               {
-                xtype:"formpanel",
-                flex:"1",
+                xtype:"toolbar",
+                docked: 'bottom',
                 scrollable: "none",
+                
                 items: [
-                        {
-                            xtype: 'fieldset',
-                            items: [
-                                {
-                                    id: "messagefield",
-                                    xtype: 'textfield',
-                                    name: 'message',
-                                    placeHolder: 'Send a message'
-                                }
-                            ]
-                        }
+                         {
+                              id: "messagefield",
+                              xtype: 'textfield',
+                              name: 'message',
+                              width: "90%",
+                              placeHolder: 'Send a message'
+                          }
                     ]
               
               }

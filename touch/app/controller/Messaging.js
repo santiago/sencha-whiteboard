@@ -20,7 +20,8 @@ Ext.define('ioExamples.controller.Messaging', {
             userlist: '#userlist',
             peoplePanel: '#peoplepanel',
             messagefield: "#messagefield",
-            peoplebackBtn: 'button[action=peopleback]'
+            peoplebackBtn: 'button[action=peopleback]',
+            chatList: "#chatList"
         }
     },
 
@@ -37,6 +38,7 @@ Ext.define('ioExamples.controller.Messaging', {
       var message = msgField.getValue();
        console.log("sendMessage",message);
        var user = this.selectedUser.data.userObj;
+       var chatList = this.getChatList();
        user.send({message:message, callback: function(){
          console.log("sendMessage callback", arguments);
          
@@ -50,10 +52,9 @@ Ext.define('ioExamples.controller.Messaging', {
            };
            console.log("saving message", record);
            chats.add(record);
+           setTimeout(function() {chatList.getScrollable().getScroller().scrollToEnd();}, 300);
            chats.sync();
-         
-         
-         msgField.setValue("");
+           msgField.setValue("");
        }});
     },
     
