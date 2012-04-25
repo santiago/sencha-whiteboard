@@ -33,11 +33,12 @@ Ext.define("ioExamples.view.People", {
               {
                   xtype: "list",
                   id: "chatList",
+                  cls: "noline",
                   styleHtmlContent: true,
                   scrollable: true,
                   scrollToTopOnRefresh: false,
                   disableSelection: true,
-                  itemTpl: " {from} : {message}",
+                  itemTpl: '<div class="{[values.from == "ME" ? "messageFromMe" : "messageFrom"]}">{message}</div>',
                   emptyText: 'No Messages'
               },
               {
