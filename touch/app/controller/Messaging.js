@@ -27,8 +27,14 @@ Ext.define('ioExamples.controller.Messaging', {
 
     showUserMessages: function(list, record){
       this.selectedUser = record;
+      
       console.log("showUserMessages", record, this.getPeoplePanel(), this.selectedUser);
       this.getPeoplePanel().setActiveItem(1);
+      
+      var chats = Ext.data.StoreManager.lookup('chats');
+      console.log("record.data.userID", record, record.data.id);
+      chats.clearFilter(true);
+      chats.filter("userID", record.data.id);
 
       this.getPeoplePanel().getAt(0).setTitle(this.selectedUser.data.name);
       this.getPeoplebackBtn().show();

@@ -187,12 +187,14 @@ Ext.define('ioExamples.controller.Main', {
         
         var chatList =  this.getChatList();
         
-        user.receive({callback: function(cb, bool, from, message){
-          console.log("user got a message!", arguments);
+        user.receive({callback: function(cb, bool, sender, message){
+           var userId = sender.getUserId();
+          console.log("user got a message!", arguments, userId);
+         
           var record = {
             message: message,
-            userID: from,
-            from: from,
+            userID: userId,
+            from: userId,
             date: new Date().getTime()
           };
           console.log("saving message", record);
@@ -253,13 +255,14 @@ Ext.define('ioExamples.controller.Main', {
         // Lazy thing to do would be to reload the app in the browser but that probably isn't a good idea.
         var self = this;
         
+        // We need to clear out the local copy of the user's data on logout
         var chats = Ext.data.StoreManager.lookup('chats');
         console.log("chats", chats);
         if(chats) {
-       //   chats.removeAll();
-            chats.getProxy().clear();
+            chats.getProxy().clear(); 
         }
         
+        //Same for the list of people in the group.
         var people = ioExamples.app.getStores("people")[0];
         if(people){
           people.removeAll();
